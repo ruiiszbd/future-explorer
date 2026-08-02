@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Vue Router 单页应用：刷新子页面时不 404
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
