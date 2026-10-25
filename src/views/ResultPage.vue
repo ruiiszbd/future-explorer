@@ -45,6 +45,10 @@ onMounted(() => {
       <GameButton size="lg" block @click="router.push('/recommend')">
         查看职业/专业推荐
       </GameButton>
+
+      <p class="disclaimer">
+        声明：本结果为趣味性格倾向参考，不构成心理诊断。专业与院校建议请到推荐页查看；院校信息依据教育部公开名单，报考以官方招生章程为准。
+      </p>
     </div>
   </div>
 </template>
@@ -144,5 +148,12 @@ onMounted(() => {
   50% {
     filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.55));
   }
+}
+
+.disclaimer {
+  margin-top: 18px;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.55);
 }
 </style>

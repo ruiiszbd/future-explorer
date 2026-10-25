@@ -4,6 +4,10 @@
  * 就业率/薪资区间参考麦可思《中国大学生就业报告》专科生公开区间（地区与年份会浮动）；
  * 推荐院校为公开报道中就业质量较高的高职示范/双高建设院校代表，仅作方向参考。
  */
+/**
+ * 推荐院校已按教育部名单（截至2026-06-17）清洗；层次以官方办学层次为准。
+ */
+
 export const defaultMbtiData = [
   {
     type: 'ISTJ',
@@ -58,7 +62,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 88%-92%',
         coreCourses: ['仓储管理', '运输管理', '供应链基础', '物流信息系统'],
-        recommendedSchools: ['天津职业大学', '宁波职业技术学院'],
+        recommendedSchools: ['天津职业大学', '宁波职业技术大学'],
         match: 90,
       },
       {
@@ -124,7 +128,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 88%-92%',
         coreCourses: ['幼儿心理学', '活动设计', '幼儿园管理', '卫生与保健'],
-        recommendedSchools: ['浙江幼儿师范高等专科学校', '石家庄幼儿师范高等专科学校'],
+        recommendedSchools: ['宁波幼儿师范高等专科学校', '石家庄幼儿师范高等专科学校'],
         match: 92,
       },
       {
@@ -132,7 +136,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 87%-91%',
         coreCourses: ['婴幼儿回应性照料', '早期学习支持', '家园共育', '托育机构运营'],
-        recommendedSchools: ['上海行健职业学院', '广州番禺职业技术学院'],
+        recommendedSchools: ['上海行健职业学院', '广东轻工职业技术大学'],
         match: 88,
       },
     ],
@@ -174,7 +178,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 85%-90%',
         coreCourses: ['个案工作', '小组工作', '社区工作', '社会福利政策'],
-        recommendedSchools: ['北京社会管理职业学院', '长沙民政职业技术学院'],
+        recommendedSchools: ['民政职业大学', '长沙民政职业技术学院'],
         match: 93,
       },
       {
@@ -182,7 +186,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '因岗位认证要求差异较大',
         coreCourses: ['普通心理学', '发展心理学', '心理咨询基础', '团体辅导'],
-        recommendedSchools: ['结合本地师范/医药高职开设情况选择'],
+        recommendedSchools: ['天津医学高等专科学校', '宁波幼儿师范高等专科学校'],
         match: 86,
       },
       {
@@ -232,7 +236,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 88%-93%',
         coreCourses: ['Python 程序设计', '数据库', '数据采集', '数据可视化'],
-        recommendedSchools: ['深圳职业技术大学', '重庆电子工程职业学院'],
+        recommendedSchools: ['深圳职业技术大学', '重庆电子科技职业大学'],
         match: 94,
       },
       {
@@ -240,7 +244,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 87%-92%',
         coreCourses: ['Java/Python', 'Web 开发', '数据库', '软件测试'],
-        recommendedSchools: ['深圳信息职业技术学院', '无锡职业技术学院'],
+        recommendedSchools: ['深圳信息职业技术大学', '无锡职业技术大学'],
         match: 90,
       },
       {
@@ -248,7 +252,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 90%-94%',
         coreCourses: ['电机拖动', 'PLC', '传感与检测', '工业网络'],
-        recommendedSchools: ['金华职业技术大学', '黄河水利职业技术学院'],
+        recommendedSchools: ['金华职业技术大学', '黄河水利职业技术大学'],
         match: 85,
       },
     ],
@@ -290,7 +294,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 91%-95%',
         coreCourses: ['机械制图', '电工电子', 'PLC', '液压与气动'],
-        recommendedSchools: ['无锡职业技术学院', '湖南铁道职业技术学院'],
+        recommendedSchools: ['无锡职业技术大学', '湖南铁道职业技术学院'],
         match: 95,
       },
       {
@@ -298,7 +302,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 89%-93%',
         coreCourses: ['发动机构造', '底盘技术', '汽车电控', '新能源汽车基础'],
-        recommendedSchools: ['杨凌职业技术学院', '广东交通职业技术学院'],
+        recommendedSchools: ['陕西农林职业技术大学', '广东交通职业技术学院'],
         match: 91,
       },
       {
@@ -306,7 +310,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 88%-93%',
         coreCourses: ['机器人编程', '传感器', '电气控制', '产线集成'],
-        recommendedSchools: ['常州机电职业技术学院', '天津职业技术师范大学合作高职体系相关院校'],
+        recommendedSchools: ['常州机电职业技术学院', '天津职业大学', '天津电子信息职业技术学院'],
         match: 86,
       },
     ],
@@ -356,7 +360,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 85%-90%',
         coreCourses: ['化妆造型', '形象美学', '发型设计', '化妆化妆造型实践'],
-        recommendedSchools: ['北京戏曲艺术职业学院相关美业高职', '地方优质美业高职'],
+        recommendedSchools: ['北京戏曲艺术职业学院', '广东文艺职业学院'],
         match: 87,
       },
       {
@@ -364,7 +368,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 84%-89%',
         coreCourses: ['手绘表现', '室内设计', '材料工艺', '效果图制作'],
-        recommendedSchools: ['深圳职业技术大学', '广州番禺职业技术学院'],
+        recommendedSchools: ['深圳职业技术大学', '广东轻工职业技术大学'],
         match: 83,
       },
     ],
@@ -406,7 +410,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 84%-89%',
         coreCourses: ['新闻采写', '新媒体运营', '短视频制作', '传播学基础'],
-        recommendedSchools: ['浙江传媒学院相关高职合作体系/地方传媒高职', '湖南大众传媒职业技术学院'],
+        recommendedSchools: ['湖南大众传媒职业技术学院', '浙江横店影视职业学院'],
         match: 91,
       },
       {
@@ -422,7 +426,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 83%-88%',
         coreCourses: ['文创策划', '项目执行', '文案创作', '活动运营'],
-        recommendedSchools: ['苏州工艺美术职业技术学院', '地方文旅特色高职'],
+        recommendedSchools: ['苏州工艺美术职业技术学院', '浙江旅游职业学院', '上海旅游高等专科学校'],
         match: 86,
       },
     ],
@@ -464,7 +468,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 88%-93%',
         coreCourses: ['程序设计', '数据库', '操作系统', '计算机网络'],
-        recommendedSchools: ['深圳信息职业技术学院', '北京电子科技职业学院'],
+        recommendedSchools: ['深圳信息职业技术大学', '北京电子科技学院'],
         match: 94,
       },
       {
@@ -472,7 +476,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 87%-92%',
         coreCourses: ['Linux', '虚拟化', '云平台运维', '容器基础'],
-        recommendedSchools: ['深圳职业技术大学', '重庆电子工程职业学院'],
+        recommendedSchools: ['深圳职业技术大学', '重庆电子科技职业大学'],
         match: 89,
       },
       {
@@ -480,7 +484,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 86%-91%',
         coreCourses: ['网络攻防基础', '安全运维', '密码学入门', '合规基础'],
-        recommendedSchools: ['信息安全特色高职（如部分公安/电子类高职）'],
+        recommendedSchools: ['重庆电子科技职业大学', '广东科学技术职业学院'],
         match: 85,
       },
     ],
@@ -530,7 +534,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 89%-93%',
         coreCourses: ['网店运营', '直播电商', '数据分析', '客户服务'],
-        recommendedSchools: ['义乌工商职业技术学院', '杭州职业技术学院'],
+        recommendedSchools: ['义乌工商职业技术学院', '杭州职业技术大学'],
         match: 91,
       },
       {
@@ -538,7 +542,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 88%-92%',
         coreCourses: ['汽车构造', '销售实务', '售后服务', '客户关系'],
-        recommendedSchools: ['广东交通职业技术学院', '杨凌职业技术学院'],
+        recommendedSchools: ['广东交通职业技术学院', '陕西农林职业技术大学'],
         match: 85,
       },
     ],
@@ -638,7 +642,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 89%-93%',
         coreCourses: ['内容电商', '社群运营', '直播运营', '数据分析'],
-        recommendedSchools: ['义乌工商职业技术学院', '杭州职业技术学院'],
+        recommendedSchools: ['义乌工商职业技术学院', '杭州职业技术大学'],
         match: 94,
       },
       {
@@ -646,7 +650,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 85%-90%',
         coreCourses: ['广告创意', '平面设计', '品牌设计', '营销传播'],
-        recommendedSchools: ['上海工艺美术职业学院', '广州番禺职业技术学院'],
+        recommendedSchools: ['上海工艺美术职业学院', '广东轻工职业技术大学'],
         match: 88,
       },
       {
@@ -654,7 +658,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 86%-91%',
         coreCourses: ['导游实务', '旅行社运营', '研学旅行', '新媒体营销'],
-        recommendedSchools: ['浙江旅游职业学院', '桂林旅游学院相关高职体系'],
+        recommendedSchools: ['浙江旅游职业学院', '上海旅游高等专科学校'],
         match: 84,
       },
     ],
@@ -704,7 +708,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 87%-92%',
         coreCourses: ['移动应用开发', '前端基础', '接口调试', '产品思维'],
-        recommendedSchools: ['深圳信息职业技术学院', '重庆电子工程职业学院'],
+        recommendedSchools: ['深圳信息职业技术大学', '重庆电子科技职业大学'],
         match: 87,
       },
       {
@@ -770,7 +774,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 88%-92%',
         coreCourses: ['建筑工程计量', '计价软件', '招投标', '工程经济'],
-        recommendedSchools: ['黄河水利职业技术学院', '四川建筑职业技术学院'],
+        recommendedSchools: ['黄河水利职业技术大学', '四川建筑职业技术大学'],
         match: 84,
       },
     ],
@@ -812,7 +816,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 86%-91%',
         coreCourses: ['招聘与配置', '薪酬基础', '员工关系', '劳动法规入门'],
-        recommendedSchools: ['北京社会管理职业学院', '广东科学技术职业学院'],
+        recommendedSchools: ['民政职业大学', '广东科学技术职业学院'],
         match: 93,
       },
       {
@@ -820,7 +824,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 88%-92%',
         coreCourses: ['幼儿教育活动', '班级管理', '家园沟通', '卫生保健'],
-        recommendedSchools: ['浙江幼儿师范高等专科学校', '石家庄幼儿师范高等专科学校'],
+        recommendedSchools: ['宁波幼儿师范高等专科学校', '石家庄幼儿师范高等专科学校'],
         match: 90,
       },
       {
@@ -828,7 +832,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 85%-90%',
         coreCourses: ['社区工作方法', '公共服务', '活动组织', '调解沟通'],
-        recommendedSchools: ['长沙民政职业技术学院', '北京社会管理职业学院'],
+        recommendedSchools: ['长沙民政职业技术学院', '民政职业大学'],
         match: 86,
       },
     ],
@@ -878,7 +882,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 86%-91%',
         coreCourses: ['组织行为', '培训与开发', '招聘', '员工关系'],
-        recommendedSchools: ['北京社会管理职业学院', '广东科学技术职业学院'],
+        recommendedSchools: ['民政职业大学', '广东科学技术职业学院'],
         match: 92,
       },
       {
@@ -886,7 +890,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 87%-91%',
         coreCourses: ['婴幼儿发展', '教育活动设计', '家园共育', '托育实践'],
-        recommendedSchools: ['地方优质幼教/托育高职'],
+        recommendedSchools: ['宁波幼儿师范高等专科学校', '广州幼儿师范高等专科学校'],
         match: 86,
       },
     ],
@@ -936,7 +940,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 89%-93%',
         coreCourses: ['电商运营', '供应链基础', '数据分析', '客户经营'],
-        recommendedSchools: ['义乌工商职业技术学院', '杭州职业技术学院'],
+        recommendedSchools: ['义乌工商职业技术学院', '杭州职业技术大学'],
         match: 91,
       },
       {
@@ -944,7 +948,7 @@ export const defaultMbtiData = [
         level: '专科',
         employmentRate: '约 87%-92%',
         coreCourses: ['工程项目管理', '造价基础', '施工组织', '合同管理'],
-        recommendedSchools: ['四川建筑职业技术学院', '黄河水利职业技术学院'],
+        recommendedSchools: ['四川建筑职业技术大学', '黄河水利职业技术大学'],
         match: 85,
       },
     ],

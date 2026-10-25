@@ -4,7 +4,7 @@ import { defaultMbtiData } from '../data/mbtiData'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
 
 const AUTH_KEY = 'turecareer_admin_auth'
-const DATA_KEY = 'turecareer_admin_data'
+const DATA_KEY = 'turecareer_admin_data_v2'
 
 function loadLocalData() {
   try {

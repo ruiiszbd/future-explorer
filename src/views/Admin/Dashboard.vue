@@ -18,7 +18,7 @@ onMounted(async () => {
 function handleLogin() {
   error.value = ''
   if (!admin.login(password.value)) {
-    error.value = '密码错误（默认 123456，或使用环境变量 VITE_ADMIN_PASSWORD）'
+    error.value = '密码错误。请确认 VITE_ADMIN_PASSWORD（本地见 .env，线上见 Netlify 环境变量）'
     return
   }
   admin.hydrateFromRemote()
@@ -55,7 +55,8 @@ async function onImport(e) {
     <div class="admin-shell">
       <template v-if="!admin.authenticated">
         <h1>管理后台登录</h1>
-        <p class="muted">仅管理员可见。默认密码 admin 场景使用 `123456`。</p>
+        <p class="muted">仅管理员可见。请使用环境变量 VITE_ADMIN_PASSWORD 设置的密码登录。</p>
+        <p class="muted warn">安全提示：上线后请勿继续使用弱默认密码；在 Netlify 环境变量中修改 VITE_ADMIN_PASSWORD 并重新部署。</p>
         <input v-model="password" type="password" placeholder="输入管理密码" @keyup.enter="handleLogin" />
         <p v-if="error" class="error">{{ error }}</p>
         <GameButton block @click="handleLogin">登录</GameButton>
@@ -130,6 +131,11 @@ h1 {
 .muted {
   color: rgba(255, 255, 255, 0.65);
   font-size: 0.92rem;
+}
+
+.warn {
+  color: #fde68a;
+  margin-top: 6px;
 }
 
 .error {

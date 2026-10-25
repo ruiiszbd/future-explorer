@@ -82,7 +82,7 @@ export const useResultStore = defineStore('result', {
       } finally {
         if (!loadedRemote) {
           try {
-            const adminCache = JSON.parse(localStorage.getItem('turecareer_admin_data') || 'null')
+            const adminCache = JSON.parse(localStorage.getItem('turecareer_admin_data_v2') || 'null')
             if (adminCache?.recommendations?.length) {
               this.recommendations = adminCache.recommendations
             }

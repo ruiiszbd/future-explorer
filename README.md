@@ -1,20 +1,20 @@
 # 未来探索者 · TureCareer Explorer
 
-面向高三毕业生与专科院校学生的游戏化 MBTI 职业/专业推荐网页应用。
+面向高三、中职毕业生与高职/职业本科意向学生的游戏化性格—专业匹配网页应用。
 
 - 前端：Vue 3 + Vite + Pinia + Vue Router + GSAP
-- 数据：本地默认题库/推荐数据，可选接入 Supabase
-- 部署：Vercel
-- 分享：html2canvas 生成结果长图
+- 院校数据：教育部《全国普通高等学校名单》（截至 2026-06-17，2952 所）
+- 云端：可选 Supabase（题库与推荐同步）
+- 部署：Netlify（亦可 Vercel）
+- 分享：html2canvas 长图
 
 ## 功能概览
 
-1. 首页 → 16 题测试 → 加载动画 → 结果页 → 职业/专业推荐
-2. 本地进度与结果缓存（localStorage），刷新可继续
-3. 分享长图（Top3 职业 + Top3 专业）
-4. 管理后台（首页底部小字入口）：题库、推荐数据、JSON 导入导出、同步 Supabase
-
-默认管理密码：`123456`（可用环境变量 `VITE_ADMIN_PASSWORD` 覆盖）
+1. 首页 → 16 题测试 → 加载 → 结果 → 职业/专业推荐
+2. 推荐页可按**省份**优先展示本省院校，并标注**专科 / 本科（含职业本科）**
+3. 推荐校名已对齐官方名单；结果页/推荐页含免责声明
+4. 测完可做「有用/一般/没用」反馈（先存 localStorage）
+5. 管理后台：题库、推荐、JSON 备份、同步 Supabase
 
 ## 快速开始
 
@@ -23,9 +23,7 @@ npm install
 npm run dev
 ```
 
-浏览器打开终端提示的本地地址即可。
-
-未配置 Supabase 时，应用会自动使用 `src/data/questions.js` 与 `src/data/mbtiData.js` 中的内置数据。
+未配置 Supabase 时，使用 `src/data/` 内置题库、推荐与院校名单。
 
 ## 环境变量
 
@@ -34,60 +32,48 @@ npm run dev
 ```bash
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
-VITE_ADMIN_PASSWORD=123456
+VITE_ADMIN_PASSWORD=请改成强密码
 ```
 
-## Supabase 初始化
+**安全提示**：上线后务必在 Netlify 环境变量中设置强 `VITE_ADMIN_PASSWORD`，不要使用弱默认密码。
 
-1. 创建 Supabase 项目
-2. 在 SQL Editor 执行 `supabase/schema.sql`
-3. 配置前端环境变量
-4. 登录管理后台，点击「同步到 Supabase」写入题库与推荐数据
+## 院校数据
 
-> 说明：`schema.sql` 中为演示方便开放了 anon 写策略。生产环境请改为 service role / 认证管理员策略。
+- 源文件：`院校名单.xls`（全国普通高等学校名单）
+- 生成模块：`src/data/schools.js`
+- 重新生成：
 
-## Vercel 部署
-
-1. 将仓库推送到 GitHub
-2. 在 [Vercel](https://vercel.com) Import 该仓库
-3. Framework Preset 选择 Vite
-4. 配置环境变量（同上）
-5. Deploy
-
-`vercel.json` 已配置 SPA history fallback。
-
-## 计分规则
-
-- 16 题，四个维度（E/I、S/N、T/F、J/P）各 4 题
-- 每题选项对应某一侧字母，计 1 分
-- 某侧得分 ≥ 2 则该维度取该字母
-- 百分比：该侧得分 / 4 × 100%
-
-## 数据说明
-
-职业与专业推荐尽量对齐：
-
-- 教育部《职业教育专业目录》常见专科专业名称
-- 公开高职“双高/示范”院校代表（作方向参考）
-- 麦可思等公开就业报告中专科就业率/起薪的常见区间
-
-薪资与就业率会随地区、年份波动，页面展示为参考区间，不构成承诺。
-
-## 目录结构
-
-```text
-future-explorer/
-├── src/
-│   ├── components/     # 游戏组件、按钮、分享卡
-│   ├── data/           # 默认题库与 16 型推荐
-│   ├── stores/         # Pinia：测试 / 结果 / 后台
-│   ├── views/          # 5 个主界面 + Admin
-│   ├── utils/          # 计分与分享图
-│   └── lib/supabase.js
-├── supabase/schema.sql
-├── vercel.json
-└── package.json
+```bash
+python scripts/generate-schools.js.py
 ```
+
+（需先有 `_schools_raw.json`；可用解析脚本从 xls 导出。）
+
+## Supabase
+
+1. 执行 `supabase/schema.sql`
+2. 配置环境变量
+3. 打开 `/admin` →「同步到 Supabase」
+
+## 部署（Netlify）
+
+1. 连接 GitHub 仓库并部署（`netlify.toml` 已配置 `npm run build` → `dist`）
+2. 配置上述环境变量
+3. **关闭访客密码保护**，确保公网可打开  
+   详见：`docs/deploy-checklist.md`
+
+当前生产示例域名以你的 Netlify 项目为准（如 `*.netlify.app`）。
+
+## 文档
+
+- `docs/deploy-checklist.md` — 上线与公开访问检查
+- `docs/school-partnership.md` — 高职/职业大学招生合作一页纸
+
+## 产品边界
+
+- 趣味性格倾向参考，**非心理诊断**
+- 院校信息以公开名单为准，报考以招生章程为准
+- 薪资/就业率为公开区间参考，非承诺
 
 ## 脚本
 
@@ -96,7 +82,3 @@ future-explorer/
 | `npm run dev` | 本地开发 |
 | `npm run build` | 生产构建 |
 | `npm run preview` | 预览构建产物 |
-
-## 许可证
-
-仅供学习与项目实践使用。

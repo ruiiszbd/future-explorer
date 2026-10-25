@@ -70,7 +70,7 @@ export const useTestStore = defineStore('test', {
         }
 
         // 回退：管理后台本地编辑缓存
-        const adminCache = JSON.parse(localStorage.getItem('turecareer_admin_data') || 'null')
+        const adminCache = JSON.parse(localStorage.getItem('turecareer_admin_data_v2') || 'null')
         if (adminCache?.questions?.length) {
           this.questions = adminCache.questions
         }

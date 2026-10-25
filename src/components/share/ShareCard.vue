@@ -5,6 +5,8 @@ defineProps({
   description: String,
   careers: { type: Array, default: () => [] },
   majors: { type: Array, default: () => [] },
+  schools: { type: Array, default: () => [] },
+  province: { type: String, default: '' },
 })
 </script>
 
@@ -14,6 +16,7 @@ defineProps({
     <div class="share-card__type">{{ type }}</div>
     <div class="share-card__name">{{ typeName }}</div>
     <p class="share-card__desc">{{ description }}</p>
+    <p v-if="province" class="share-card__province">关注地区：{{ province }}</p>
 
     <section>
       <h3>Top 职业推荐</h3>
@@ -30,12 +33,26 @@ defineProps({
       <ul>
         <li v-for="(m, i) in majors.slice(0, 3)" :key="`m-${i}`">
           <strong>{{ i + 1 }}. {{ m.name }}</strong>
-          <span>{{ m.level }} · {{ m.employmentRate }}</span>
+          <span>{{ m.levelLabel || m.level }} · {{ m.employmentRate }}</span>
         </li>
       </ul>
     </section>
 
-    <footer>扫码/打开链接开启你的职业冒险 ✨</footer>
+    <section v-if="schools.length">
+      <h3>可核验院校代表</h3>
+      <ul>
+        <li v-for="(s, i) in schools.slice(0, 3)" :key="`s-${i}`">
+          <strong>{{ i + 1 }}. {{ s }}</strong>
+          <span>层次以教育部名单为准</span>
+        </li>
+      </ul>
+    </section>
+
+    <footer>
+      数据仅供参考，非心理诊断；报考以官方招生章程为准
+      <br />
+      扫码/打开链接开启你的职业冒险
+    </footer>
   </div>
 </template>
 
@@ -71,11 +88,19 @@ defineProps({
   font-weight: 800;
 }
 
-.share-card__desc {
-  margin: 14px 0 22px;
+.share-card__desc,
+.share-card__province {
+  margin: 14px 0 8px;
   font-size: 14px;
   line-height: 1.55;
   opacity: 0.9;
+}
+
+.share-card__province {
+  margin-top: 0;
+  margin-bottom: 18px;
+  color: #fde68a;
+  font-weight: 700;
 }
 
 section + section {
@@ -109,8 +134,9 @@ li span {
 
 footer {
   margin-top: 22px;
-  font-size: 12px;
+  font-size: 11px;
   opacity: 0.8;
   text-align: center;
+  line-height: 1.5;
 }
 </style>
