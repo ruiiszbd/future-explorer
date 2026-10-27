@@ -60,7 +60,7 @@ function startAdventure(resume = false) {
         <p class="eyebrow">TureCareer Explorer</p>
         <h1>未来探索者</h1>
         <p class="subtitle">
-          用一场星际小冒险，读懂性格代码，解锁适合你的专科专业与职业航线。
+          用一场星际小冒险，读懂性格代码，先解锁适合你的职业方向建议。
         </p>
       </div>
 

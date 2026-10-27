@@ -43,11 +43,11 @@ onMounted(() => {
       </section>
 
       <GameButton size="lg" block @click="router.push('/recommend')">
-        查看职业/专业推荐
+        查看职业方向推荐
       </GameButton>
 
       <p class="disclaimer">
-        声明：本结果为趣味性格倾向参考，不构成心理诊断。专业与院校建议请到推荐页查看；院校信息依据教育部公开名单，报考以官方招生章程为准。
+        声明：本结果为趣味性格倾向参考，不构成心理诊断。当前优先推荐职业方向；院校推荐将在数据梳理完整后开放。
       </p>
     </div>
   </div>

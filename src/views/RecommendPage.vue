@@ -7,12 +7,9 @@ import ShareCard from '../components/share/ShareCard.vue'
 import { useResultStore } from '../stores/result'
 import { useTestStore } from '../stores/test'
 import { usePrefsStore } from '../stores/prefs'
+import { features } from '../config/features'
 import { captureShareImage, downloadDataUrl } from '../utils/shareGenerator'
-import {
-  enrichRecommendedSchools,
-  formatMajorLevel,
-  schoolProvinces,
-} from '../utils/schoolRecommend'
+import { formatMajorLevel } from '../utils/majorFormat'
 
 const router = useRouter()
 const resultStore = useResultStore()
@@ -20,22 +17,31 @@ const testStore = useTestStore()
 const prefs = usePrefsStore()
 
 const openCareer = ref(0)
-const openMajor = ref(0)
+const openMajor = ref(-1)
 const sharing = ref(false)
 const shareRef = ref(null)
 const previewUrl = ref('')
 const selectedProvince = ref(prefs.province || '')
 const feedback = ref(prefs.getFeedback(resultStore.type) || '')
+const schoolProvinces = ref([])
+const enrichRecommendedSchools = ref(null)
+
+const showSchools = features.schoolRecommendations
+const showMajors = features.majorRecommendations
 
 const enrichedMajors = computed(() =>
   resultStore.majors.map((major) => ({
     ...major,
     levelLabel: formatMajorLevel(major.level),
-    schools: enrichRecommendedSchools(major.recommendedSchools || [], selectedProvince.value),
+    schools:
+      showSchools && enrichRecommendedSchools.value
+        ? enrichRecommendedSchools.value(major.recommendedSchools || [], selectedProvince.value)
+        : [],
   })),
 )
 
 const topSchoolNames = computed(() => {
+  if (!showSchools) return []
   const names = []
   enrichedMajors.value.forEach((m) => {
     m.schools.forEach((s) => {
@@ -45,8 +51,17 @@ const topSchoolNames = computed(() => {
   return names.slice(0, 3)
 })
 
-onMounted(() => {
-  if (!resultStore.hasResult) router.replace('/')
+onMounted(async () => {
+  if (!resultStore.hasResult) {
+    router.replace('/')
+    return
+  }
+  // 仅在开启院校推荐时加载全量院校库，避免无用大包
+  if (showSchools) {
+    const mod = await import('../utils/schoolRecommend')
+    schoolProvinces.value = mod.schoolProvinces
+    enrichRecommendedSchools.value = mod.enrichRecommendedSchools
+  }
 })
 
 function onProvinceChange() {
@@ -94,11 +109,11 @@ function restart() {
     <div v-if="resultStore.hasResult" class="page-inner">
       <header class="head glass-panel">
         <p>匹配完成</p>
-        <h1>{{ resultStore.type }} · 专属航线</h1>
-        <span>按匹配度排序 · 院校已对齐教育部公开名单</span>
+        <h1>{{ resultStore.type }} · 职业方向</h1>
+        <span>先看适合你的职业方向；院校推荐将在数据梳理完整后开放</span>
       </header>
 
-      <section class="filter glass-panel">
+      <section v-if="showSchools" class="filter glass-panel">
         <label for="province">所在省份（可选，用于优先展示本省院校）</label>
         <select id="province" v-model="selectedProvince" @change="onProvinceChange">
           <option value="">不限省份</option>
@@ -107,7 +122,8 @@ function restart() {
       </section>
 
       <section class="block">
-        <h2>职业推荐</h2>
+        <h2>职业方向推荐</h2>
+        <p class="block-tip">根据性格倾向匹配，展开可查看理由、薪资区间与技能</p>
         <article
           v-for="(career, i) in resultStore.careers"
           :key="career.name"
@@ -131,8 +147,9 @@ function restart() {
         </article>
       </section>
 
-      <section class="block">
-        <h2>专业推荐</h2>
+      <section v-if="showMajors" class="block block--secondary">
+        <h2>相关专业方向（参考）</h2>
+        <p class="block-tip">仅作学习方向参考，暂不绑定具体院校</p>
         <article
           v-for="(major, i) in enrichedMajors"
           :key="major.name"
@@ -150,7 +167,7 @@ function restart() {
           <div v-show="openMajor === i" class="card__body">
             <p><strong>就业率参考：</strong>{{ major.employmentRate }}</p>
             <p><strong>核心课程：</strong>{{ (major.coreCourses || []).join('、') }}</p>
-            <div class="schools">
+            <div v-if="showSchools" class="schools">
               <strong>推荐院校（可核验）：</strong>
               <ul>
                 <li v-for="school in major.schools" :key="school.name">
@@ -166,7 +183,7 @@ function restart() {
       </section>
 
       <section class="feedback glass-panel">
-        <h2>这次推荐对你有帮助吗？</h2>
+        <h2>这次职业方向推荐对你有帮助吗？</h2>
         <div class="feedback__btns">
           <button
             type="button"
@@ -194,7 +211,7 @@ function restart() {
       </section>
 
       <p class="disclaimer">
-        声明：本测试为趣味性格倾向参考，不构成心理诊断或升学录取承诺。院校名称与办学层次依据教育部《全国普通高等学校名单》（截至 2026-06-17）；报考请以各校当年招生章程为准。薪资与就业率为公开报告区间，存在地区与年份差异。
+        声明：本测试为趣味性格倾向参考，不构成心理诊断或就业承诺。当前优先提供职业方向建议；具体院校推荐将在学校与专业数据梳理完整后开放。薪资为公开报告区间，存在地区与年份差异。
       </p>
 
       <div class="actions">
@@ -217,9 +234,11 @@ function restart() {
             :type-name="resultStore.typeName"
             :description="resultStore.description"
             :careers="resultStore.careers"
-            :majors="enrichedMajors"
+            :majors="showMajors ? enrichedMajors : []"
             :schools="topSchoolNames"
-            :province="selectedProvince"
+            :province="showSchools ? selectedProvince : ''"
+            :show-schools="showSchools"
+            :show-majors="showMajors"
           />
         </div>
       </div>
@@ -246,9 +265,14 @@ function restart() {
 }
 
 .head span,
-.muted {
+.muted,
+.block-tip {
   color: var(--text-muted);
   font-size: 0.9rem;
+}
+
+.block-tip {
+  margin: -4px 0 12px;
 }
 
 .filter label {
@@ -269,6 +293,10 @@ function restart() {
 
 .block {
   margin-bottom: 22px;
+}
+
+.block--secondary {
+  opacity: 0.95;
 }
 
 .block h2,

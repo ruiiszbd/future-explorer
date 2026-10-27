@@ -30,7 +30,7 @@ const routes = [
     path: '/recommend',
     name: 'recommend',
     component: () => import('../views/RecommendPage.vue'),
-    meta: { title: '职业与专业推荐' },
+    meta: { title: '职业方向推荐' },
   },
   {
     path: '/admin',

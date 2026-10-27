@@ -7,6 +7,8 @@ defineProps({
   majors: { type: Array, default: () => [] },
   schools: { type: Array, default: () => [] },
   province: { type: String, default: '' },
+  showSchools: { type: Boolean, default: false },
+  showMajors: { type: Boolean, default: true },
 })
 </script>
 
@@ -16,10 +18,10 @@ defineProps({
     <div class="share-card__type">{{ type }}</div>
     <div class="share-card__name">{{ typeName }}</div>
     <p class="share-card__desc">{{ description }}</p>
-    <p v-if="province" class="share-card__province">关注地区：{{ province }}</p>
+    <p v-if="showSchools && province" class="share-card__province">关注地区：{{ province }}</p>
 
     <section>
-      <h3>Top 职业推荐</h3>
+      <h3>Top 职业方向</h3>
       <ul>
         <li v-for="(c, i) in careers.slice(0, 3)" :key="`c-${i}`">
           <strong>{{ i + 1 }}. {{ c.name }}</strong>
@@ -28,17 +30,17 @@ defineProps({
       </ul>
     </section>
 
-    <section>
-      <h3>Top 专业推荐</h3>
+    <section v-if="showMajors && majors.length">
+      <h3>相关专业方向（参考）</h3>
       <ul>
         <li v-for="(m, i) in majors.slice(0, 3)" :key="`m-${i}`">
           <strong>{{ i + 1 }}. {{ m.name }}</strong>
-          <span>{{ m.levelLabel || m.level }} · {{ m.employmentRate }}</span>
+          <span>{{ m.levelLabel || m.level }}</span>
         </li>
       </ul>
     </section>
 
-    <section v-if="schools.length">
+    <section v-if="showSchools && schools.length">
       <h3>可核验院校代表</h3>
       <ul>
         <li v-for="(s, i) in schools.slice(0, 3)" :key="`s-${i}`">
@@ -49,7 +51,7 @@ defineProps({
     </section>
 
     <footer>
-      数据仅供参考，非心理诊断；报考以官方招生章程为准
+      数据仅供参考，非心理诊断；当前聚焦职业方向建议
       <br />
       扫码/打开链接开启你的职业冒险
     </footer>
