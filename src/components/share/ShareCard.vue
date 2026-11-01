@@ -9,6 +9,9 @@ defineProps({
   province: { type: String, default: '' },
   showSchools: { type: Boolean, default: false },
   showMajors: { type: Boolean, default: true },
+  valueLine: { type: String, default: '' },
+  majorCategories: { type: Array, default: () => [] },
+  occupationMids: { type: Array, default: () => [] },
 })
 </script>
 
@@ -17,25 +20,31 @@ defineProps({
     <div class="share-card__brand">未来探索者 · TureCareer</div>
     <div class="share-card__type">{{ type }}</div>
     <div class="share-card__name">{{ typeName }}</div>
+    <p v-if="valueLine" class="share-card__province">{{ valueLine }}</p>
     <p class="share-card__desc">{{ description }}</p>
+    <p v-if="majorCategories.length" class="share-card__province">
+      专业大类：{{ majorCategories.map((item) => item.name).join('、') }}
+    </p>
+    <p v-if="occupationMids.length" class="share-card__province">
+      职业中类：{{ occupationMids.map((item) => item.name).join('、') }}
+    </p>
     <p v-if="showSchools && province" class="share-card__province">关注地区：{{ province }}</p>
 
-    <section>
-      <h3>Top 职业方向</h3>
-      <ul>
-        <li v-for="(c, i) in careers.slice(0, 3)" :key="`c-${i}`">
-          <strong>{{ i + 1 }}. {{ c.name }}</strong>
-          <span>{{ c.salary }}</span>
-        </li>
-      </ul>
-    </section>
-
     <section v-if="showMajors && majors.length">
-      <h3>相关专业方向（参考）</h3>
+      <h3>示例专业</h3>
       <ul>
         <li v-for="(m, i) in majors.slice(0, 3)" :key="`m-${i}`">
           <strong>{{ i + 1 }}. {{ m.name }}</strong>
           <span>{{ m.levelLabel || m.level }}</span>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h3>示例岗位</h3>
+      <ul>
+        <li v-for="(c, i) in careers.slice(0, 3)" :key="`c-${i}`">
+          <strong>{{ i + 1 }}. {{ c.name }}</strong>
         </li>
       </ul>
     </section>
@@ -51,7 +60,7 @@ defineProps({
     </section>
 
     <footer>
-      数据仅供参考，非心理诊断；当前聚焦职业方向建议
+      按职业兴趣整理，不是心理诊断，也不能单独决定报考
       <br />
       扫码/打开链接开启你的职业冒险
     </footer>
@@ -74,14 +83,14 @@ defineProps({
 }
 
 .share-card__type {
-  font-size: 56px;
+  font-size: 28px;
   font-weight: 900;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   background: linear-gradient(90deg, #fbbf24, #f472b6, #22d3ee);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  line-height: 1;
+  line-height: 1.35;
 }
 
 .share-card__name {

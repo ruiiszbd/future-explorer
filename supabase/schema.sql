@@ -4,7 +4,7 @@
 CREATE TABLE IF NOT EXISTS questions (
   id SERIAL PRIMARY KEY,
   question_text TEXT NOT NULL,
-  dimension VARCHAR(2) NOT NULL CHECK (dimension IN ('EI', 'SN', 'TF', 'JP')),
+  dimension VARCHAR(2) NOT NULL CHECK (dimension IN ('R', 'I', 'A', 'S', 'E', 'C', 'ST', 'IN', 'HD', 'HP', 'AU', 'MS', 'EI', 'SN', 'TF', 'JP')),
   options JSONB NOT NULL,
   order_index INT NOT NULL
 );

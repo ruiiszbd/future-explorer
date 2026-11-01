@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
 import { defaultQuestions } from '../data/questions'
-import { defaultMbtiData } from '../data/mbtiData'
+import { defaultProfiles } from '../data/profiles'
+import { filterHollandProfiles, isCurrentQuestionList, normalizeQuestionList, packOptions } from '../data/scale'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
+import { STORAGE_KEYS } from '../config/storage'
 
-const AUTH_KEY = 'turecareer_admin_auth'
-const DATA_KEY = 'turecareer_admin_data_v2'
+const AUTH_KEY = STORAGE_KEYS.adminAuth
+const DATA_KEY = STORAGE_KEYS.adminData
 
 function loadLocalData() {
   try {
@@ -15,15 +17,20 @@ function loadLocalData() {
 }
 
 const localData = loadLocalData()
+const storedProfiles = filterHollandProfiles(localData?.recommendations)
+const storedQuestions =
+  localData?.questions && isCurrentQuestionList(localData.questions)
+    ? normalizeQuestionList(localData.questions)
+    : defaultQuestions
 
 export const useAdminStore = defineStore('admin', {
   state: () => ({
     authenticated: localStorage.getItem(AUTH_KEY) === '1',
-    questions: (localData?.questions || defaultQuestions).map((q) => ({
+    questions: storedQuestions.map((q) => ({
       ...q,
       options: q.options.map((o) => ({ ...o })),
     })),
-    recommendations: (localData?.recommendations || defaultMbtiData).map((item) => ({
+    recommendations: (storedProfiles.length ? storedProfiles : defaultProfiles).map((item) => ({
       ...item,
       careers: item.careers.map((c) => ({ ...c })),
       majors: item.majors.map((m) => ({ ...m })),
@@ -74,16 +81,19 @@ export const useAdminStore = defineStore('admin', {
         supabase.from('questions').select('*').order('order_index', { ascending: true }),
         supabase.from('mbti_recommendations').select('*'),
       ])
-      if (qRes.data?.length) this.questions = qRes.data
-      if (rRes.data?.length) {
-        this.recommendations = rRes.data.map((row) => ({
+      if (qRes.data?.length && isCurrentQuestionList(qRes.data)) {
+        this.questions = normalizeQuestionList(qRes.data)
+      }
+      const usable = filterHollandProfiles(
+        (rRes.data || []).map((row) => ({
           type: row.mbti_type,
           typeName: row.type_name,
           description: row.description,
           careers: row.careers,
           majors: row.majors,
-        }))
-      }
+        })),
+      )
+      if (usable.length) this.recommendations = usable
     },
 
     addQuestion(question) {
@@ -146,8 +156,20 @@ export const useAdminStore = defineStore('admin', {
 
     importJson(jsonText) {
       const data = JSON.parse(jsonText)
-      if (data.questions) this.questions = data.questions
-      if (data.recommendations) this.recommendations = data.recommendations
+      const nextQuestions = data.questions || null
+      const nextRecommendations = data.recommendations
+        ? filterHollandProfiles(data.recommendations)
+        : null
+      if (nextQuestions && !isCurrentQuestionList(nextQuestions)) {
+        this.message = '这份题库不是当前的情境题，未导入'
+        return
+      }
+      if (data.recommendations && !nextRecommendations?.length) {
+        this.message = '推荐数据不是六种职业兴趣，未导入'
+        return
+      }
+      if (nextQuestions) this.questions = normalizeQuestionList(nextQuestions)
+      if (nextRecommendations?.length) this.recommendations = nextRecommendations
       this.persistLocal()
       this.message = '导入成功'
     },
@@ -159,16 +181,19 @@ export const useAdminStore = defineStore('admin', {
       }
       this.saving = true
       try {
-        await supabase.from('questions').delete().neq('id', 0)
-        const qPayload = this.questions.map(({ id, question_text, dimension, options, order_index }) => ({
-          id,
-          question_text,
-          dimension,
-          options,
-          order_index,
+        const qPayload = this.questions.map((question) => ({
+          id: question.id,
+          question_text: question.question_text,
+          dimension: question.dimension,
+          options: packOptions(question),
+          order_index: question.order_index,
         }))
         const { error: qErr } = await supabase.from('questions').upsert(qPayload)
         if (qErr) throw qErr
+        const questionIds = qPayload.map((item) => item.id)
+        if (questionIds.length) {
+          await supabase.from('questions').delete().not('id', 'in', `(${questionIds.join(',')})`)
+        }
 
         const rPayload = this.recommendations.map((r) => ({
           mbti_type: r.type,
@@ -181,6 +206,10 @@ export const useAdminStore = defineStore('admin', {
           onConflict: 'mbti_type',
         })
         if (rErr) throw rErr
+        await supabase
+          .from('mbti_recommendations')
+          .delete()
+          .not('mbti_type', 'in', `(${rPayload.map((item) => `"${item.mbti_type}"`).join(',')})`)
 
         this.message = '已同步到 Supabase'
         return true

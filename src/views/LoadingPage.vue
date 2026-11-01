@@ -13,9 +13,9 @@ const tip = ref('正在校准星际罗盘...')
 const shipRef = ref(null)
 
 const tips = [
-  '正在分析你的性格代码...',
-  '正在比对职业星图...',
-  '正在匹配专科航线...',
+  '正在整理你愿意做的活动...',
+  '正在对照六种职业兴趣...',
+  '正在按工作条件和做事方式排序...',
   '即将抵达结果星球...',
 ]
 
@@ -63,7 +63,7 @@ onMounted(async () => {
         <div class="planet-target" />
       </div>
       <h2>{{ tip }}</h2>
-      <p>飞船正在穿越性格星云，请稍候</p>
+      <p>飞船正在整理兴趣星图，请稍候</p>
       <div class="dots"><span /><span /><span /></div>
     </div>
   </div>

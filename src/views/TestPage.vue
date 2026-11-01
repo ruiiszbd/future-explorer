@@ -7,6 +7,7 @@ import OptionCard from '../components/game/OptionCard.vue'
 import LoadingSpinner from '../components/common/LoadingSpinner.vue'
 import { useTestStore } from '../stores/test'
 import { useResultStore } from '../stores/result'
+import { promptFor, sectionOf } from '../data/scale'
 
 const router = useRouter()
 const testStore = useTestStore()
@@ -16,6 +17,12 @@ const selectedKey = ref('')
 const animKey = ref(0)
 
 const question = computed(() => testStore.currentQuestion)
+const sectionLabel = computed(() => {
+  const section = question.value ? sectionOf(question.value.dimension) : 'interest'
+  if (section === 'value') return '工作条件'
+  if (section === 'style') return '做事方式'
+  return '情境活动'
+})
 const planetLabels = ['水星', '金星', '地球', '火星', '木星', '土星', '天王星', '海王星']
 
 onMounted(async () => {
@@ -40,6 +47,8 @@ async function onSelect(option) {
 
   selectedKey.value = ''
   animKey.value += 1
+  // 等离场动画结束再放开，避免点到正在消失的选项又推进一题
+  await new Promise((r) => setTimeout(r, 380))
   locking.value = false
 }
 
@@ -61,6 +70,14 @@ function planetName(index) {
       <Transition name="fade-slide" mode="out-in">
         <section v-if="question" :key="`${question.id}-${animKey}`" class="quest glass-panel">
           <div class="quest__badge">第 {{ testStore.currentIndex + 1 }} 关 · {{ planetName(testStore.currentIndex) }}站</div>
+          <p class="quest__section">{{ sectionLabel }}</p>
+          <img
+            v-if="question.image"
+            class="quest__image"
+            :src="question.image"
+            alt=""
+          />
+          <p class="quest__prompt">{{ question.prompt || promptFor(question.dimension) }}</p>
           <h2>{{ question.question_text }}</h2>
           <div class="quest__options">
             <OptionCard
@@ -98,6 +115,28 @@ function planetName(index) {
   color: #0f172a;
   background: linear-gradient(90deg, #fde68a, #f9a8d4);
   margin-bottom: 14px;
+}
+
+.quest__section,
+.quest__prompt {
+  color: #fde68a;
+  font-weight: 800;
+  font-size: 0.92rem;
+}
+
+.quest__prompt {
+  margin: 4px 0 8px;
+  color: rgba(255, 255, 255, 0.72);
+  font-weight: 700;
+}
+
+.quest__image {
+  display: block;
+  width: 100%;
+  height: 168px;
+  object-fit: cover;
+  border-radius: 14px;
+  margin-bottom: 12px;
 }
 
 h2 {

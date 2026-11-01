@@ -1,8 +1,10 @@
 import { defineStore } from 'pinia'
 import { defaultQuestions } from '../data/questions'
+import { isCurrentQuestionList, normalizeQuestionList } from '../data/scale'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
+import { STORAGE_KEYS } from '../config/storage'
 
-const STORAGE_KEY = 'turecareer_test_progress'
+const STORAGE_KEY = STORAGE_KEYS.testProgress
 
 function loadProgress() {
   try {
@@ -53,6 +55,17 @@ export const useTestStore = defineStore('test', {
       localStorage.removeItem(STORAGE_KEY)
     },
 
+    applyAdminQuestions() {
+      try {
+        const adminCache = JSON.parse(localStorage.getItem(STORAGE_KEYS.adminData) || 'null')
+        if (adminCache?.questions?.length && isCurrentQuestionList(adminCache.questions)) {
+          this.questions = normalizeQuestionList(adminCache.questions)
+        }
+      } catch {
+        /* 继续使用内置题库 */
+      }
+    },
+
     async fetchQuestions() {
       this.loading = true
       this.error = null
@@ -63,20 +76,17 @@ export const useTestStore = defineStore('test', {
             .select('*')
             .order('order_index', { ascending: true })
           if (error) throw error
-          if (data?.length) {
-            this.questions = data
+          if (data?.length && isCurrentQuestionList(data)) {
+            this.questions = normalizeQuestionList(data)
             return
           }
         }
 
-        // 回退：管理后台本地编辑缓存
-        const adminCache = JSON.parse(localStorage.getItem('turecareer_admin_data_v2') || 'null')
-        if (adminCache?.questions?.length) {
-          this.questions = adminCache.questions
-        }
+        this.applyAdminQuestions()
       } catch (err) {
-        console.warn('使用本地题库（远程拉取失败）', err)
+        console.warn('使用本地题库（远程拉取失败或仍是旧性格题）', err)
         this.error = err.message
+        this.applyAdminQuestions()
       } finally {
         this.loading = false
         this.hydrated = true
@@ -90,7 +100,9 @@ export const useTestStore = defineStore('test', {
         questionId: this.currentQuestion.id,
         key: option.key,
         trait: option.trait,
+        score: Number(option.score),
         text: option.text,
+        dimension: this.currentQuestion.dimension,
       }
 
       if (this.currentIndex < this.questions.length - 1) {

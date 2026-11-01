@@ -10,6 +10,9 @@ import { usePrefsStore } from '../stores/prefs'
 import { features } from '../config/features'
 import { captureShareImage, downloadDataUrl } from '../utils/shareGenerator'
 import { formatMajorLevel } from '../utils/majorFormat'
+import { EXAMPLE_NOTE } from '../data/catalogView'
+import { interestHeadline } from '../data/scale'
+import { EXPLORE_DISCLAIMER } from '../config/copy'
 
 const router = useRouter()
 const resultStore = useResultStore()
@@ -28,6 +31,12 @@ const enrichRecommendedSchools = ref(null)
 
 const showSchools = features.schoolRecommendations
 const showMajors = features.majorRecommendations
+const headline = computed(() =>
+  interestHeadline(resultStore.type, {
+    tied: resultStore.tied,
+    lowInterest: resultStore.lowInterest,
+  }),
+)
 
 const enrichedMajors = computed(() =>
   resultStore.majors.map((major) => ({
@@ -108,9 +117,13 @@ function restart() {
     <ParticleBackground />
     <div v-if="resultStore.hasResult" class="page-inner">
       <header class="head glass-panel">
-        <p>匹配完成</p>
-        <h1>{{ resultStore.type }} · 职业方向</h1>
-        <span>先看适合你的职业方向；院校推荐将在数据梳理完整后开放</span>
+        <p>探索完成</p>
+        <h1>{{ headline.title }}</h1>
+        <p v-if="headline.note" class="headline-note">{{ headline.note }}</p>
+        <span v-if="resultStore.lowInterest">活动兴趣还不集中，下面只是了解的起点</span>
+        <span v-else>按你愿意做的活动和工作条件整理。院校推荐将在数据梳理完整后开放</span>
+        <p v-if="resultStore.valueNote" class="value-note">{{ resultStore.valueNote }}</p>
+        <p v-if="resultStore.styleNote" class="style-note">{{ resultStore.styleNote }}</p>
       </header>
 
       <section v-if="showSchools" class="filter glass-panel">
@@ -121,35 +134,21 @@ function restart() {
         </select>
       </section>
 
-      <section class="block">
-        <h2>职业方向推荐</h2>
-        <p class="block-tip">根据性格倾向匹配，展开可查看理由、薪资区间与技能</p>
-        <article
-          v-for="(career, i) in resultStore.careers"
-          :key="career.name"
-          class="card glass-panel"
-          :class="{ open: openCareer === i }"
-          @click="toggleCareer(i)"
-        >
-          <div class="card__top">
-            <div>
-              <h3>{{ career.name }}</h3>
-              <p class="match">匹配度 {{ career.match || 80 }}%</p>
-            </div>
-            <span class="chev">{{ openCareer === i ? '收起' : '展开' }}</span>
-          </div>
-          <div v-show="openCareer === i" class="card__body">
-            <p>{{ career.reason }}</p>
-            <p><strong>薪资前景：</strong>{{ career.salary }}</p>
-            <p><strong>所需技能：</strong>{{ career.skills }}</p>
-            <p><strong>就业方向：</strong>{{ (career.industries || []).join('、') }}</p>
-          </div>
-        </article>
+      <section class="catalog glass-panel">
+        <h2>对应的专业大类</h2>
+        <ul class="catalog-list">
+          <li v-for="item in resultStore.majorCategories" :key="item.code">{{ item.name }}</li>
+        </ul>
+        <h2>对应的职业中类</h2>
+        <ul class="catalog-list">
+          <li v-for="item in resultStore.occupationMids" :key="item.code">{{ item.name }}</li>
+        </ul>
+        <p class="block-tip">{{ EXAMPLE_NOTE }}负责人岗位、军队人员，以及不便分类的其他从业人员，不作为入门推荐。</p>
       </section>
 
       <section v-if="showMajors" class="block block--secondary">
-        <h2>相关专业方向（参考）</h2>
-        <p class="block-tip">仅作学习方向参考，暂不绑定具体院校</p>
+        <h2>示例专业</h2>
+        <p class="block-tip">只列出上面大类里的例子，暂不绑定具体院校</p>
         <article
           v-for="(major, i) in enrichedMajors"
           :key="major.name"
@@ -160,12 +159,16 @@ function restart() {
           <div class="card__top">
             <div>
               <h3>{{ major.name }}</h3>
-              <p class="match">{{ major.levelLabel }} · 匹配度 {{ major.match || 80 }}%</p>
+              <p class="match">
+                {{ major.majorCategoryName }}<template v-if="major.majorClassName"> · {{ major.majorClassName }}</template>
+                · {{ major.levelLabel }} · {{ major.interestLabel }}
+              </p>
             </div>
             <span class="chev">{{ openMajor === i ? '收起' : '展开' }}</span>
           </div>
           <div v-show="openMajor === i" class="card__body">
-            <p><strong>就业率参考：</strong>{{ major.employmentRate }}</p>
+            <p v-if="major.catalogName"><strong>目录名称：</strong>{{ major.catalogName }}</p>
+            <p v-if="major.majorCode"><strong>专业代码：</strong>{{ major.majorCode }}</p>
             <p><strong>核心课程：</strong>{{ (major.coreCourses || []).join('、') }}</p>
             <div v-if="showSchools" class="schools">
               <strong>推荐院校（可核验）：</strong>
@@ -178,6 +181,34 @@ function restart() {
                 </li>
               </ul>
             </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="block">
+        <h2>示例岗位</h2>
+        <p class="block-tip">只列出上面中类里的例子。展开可查看相近活动、入学前核对与技能</p>
+        <article
+          v-for="(career, i) in resultStore.careers"
+          :key="career.name"
+          class="card glass-panel"
+          :class="{ open: openCareer === i }"
+          @click="toggleCareer(i)"
+        >
+          <div class="card__top">
+            <div>
+              <h3>{{ career.name }}</h3>
+              <p class="match">
+                <template v-if="career.occupationMidName">{{ career.occupationMidName }} · </template>{{ career.interestLabel }}
+              </p>
+            </div>
+            <span class="chev">{{ openCareer === i ? '收起' : '展开' }}</span>
+          </div>
+          <div v-show="openCareer === i" class="card__body">
+            <p>{{ career.reason }}</p>
+            <p v-if="career.checks?.length"><strong>入学前核对：</strong>{{ career.checks.join('；') }}</p>
+            <p><strong>所需技能：</strong>{{ career.skills }}</p>
+            <p><strong>就业方向：</strong>{{ (career.industries || []).join('、') }}</p>
           </div>
         </article>
       </section>
@@ -211,7 +242,7 @@ function restart() {
       </section>
 
       <p class="disclaimer">
-        声明：本测试为趣味性格倾向参考，不构成心理诊断或就业承诺。当前优先提供职业方向建议；具体院校推荐将在学校与专业数据梳理完整后开放。薪资为公开报告区间，存在地区与年份差异。
+        声明：{{ EXPLORE_DISCLAIMER }}当前优先提供职业方向建议；具体院校推荐将在学校与专业数据梳理完整后开放。
       </p>
 
       <div class="actions">
@@ -230,8 +261,8 @@ function restart() {
       <div class="share-offscreen" aria-hidden="true">
         <div ref="shareRef">
           <ShareCard
-            :type="resultStore.type"
-            :type-name="resultStore.typeName"
+            :type="headline.title"
+            :type-name="headline.note"
             :description="resultStore.description"
             :careers="resultStore.careers"
             :majors="showMajors ? enrichedMajors : []"
@@ -239,6 +270,9 @@ function restart() {
             :province="showSchools ? selectedProvince : ''"
             :show-schools="showSchools"
             :show-majors="showMajors"
+            :value-line="[resultStore.valueNote, resultStore.styleNote].filter(Boolean).join(' ')"
+            :major-categories="resultStore.majorCategories"
+            :occupation-mids="resultStore.occupationMids"
           />
         </div>
       </div>
@@ -249,9 +283,36 @@ function restart() {
 <style scoped>
 .head,
 .filter,
-.feedback {
+.feedback,
+.catalog {
   padding: 20px;
   margin-bottom: 16px;
+}
+
+.catalog h2 {
+  margin: 0 0 12px;
+  font-size: 1.15rem;
+}
+
+.catalog h2 + .catalog-list {
+  margin-bottom: 16px;
+}
+
+.catalog-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.catalog-list li {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  font-weight: 700;
+  line-height: 1.4;
 }
 
 .head p {
@@ -262,6 +323,12 @@ function restart() {
 .head h1 {
   margin: 6px 0;
   font-size: 1.6rem;
+  line-height: 1.35;
+}
+
+.headline-note {
+  margin: 0 0 8px;
+  font-weight: 800;
 }
 
 .head span,
@@ -269,6 +336,18 @@ function restart() {
 .block-tip {
   color: var(--text-muted);
   font-size: 0.9rem;
+}
+
+.value-note,
+.style-note {
+  margin-top: 8px;
+  color: #fde68a;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.style-note {
+  color: #bae6fd;
 }
 
 .block-tip {

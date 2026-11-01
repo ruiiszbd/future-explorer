@@ -86,6 +86,7 @@ async function onImport(e) {
         <div class="nav-grid">
           <button class="nav-card" @click="go('/admin/questions')">题库管理</button>
           <button class="nav-card" @click="go('/admin/data')">推荐数据管理</button>
+          <button class="nav-card" @click="go('/admin/codes')">兑换码</button>
         </div>
 
         <section class="panel">

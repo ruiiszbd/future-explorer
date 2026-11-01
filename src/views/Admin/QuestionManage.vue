@@ -3,6 +3,7 @@ import { computed, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import GameButton from '../../components/common/GameButton.vue'
 import { useAdminStore } from '../../stores/admin'
+import { DIMENSION_OPTIONS, STYLE_PAIRS, choicesFor, dimensionLabel, isStyleCode, sectionOf } from '../../data/scale'
 
 const admin = useAdminStore()
 const router = useRouter()
@@ -11,50 +12,36 @@ const dragFrom = ref(null)
 
 const form = reactive({
   question_text: '',
-  dimension: 'EI',
-  options: [
-    { key: 'A', text: '', trait: 'E' },
-    { key: 'B', text: '', trait: 'I' },
-    { key: 'C', text: '', trait: 'E' },
-    { key: 'D', text: '', trait: 'I' },
-  ],
+  dimension: 'R',
+  image: '',
+  options: choicesFor('R'),
 })
 
 const sorted = computed(() =>
   [...admin.questions].sort((a, b) => a.order_index - b.order_index),
 )
 
-const traitOptions = {
-  EI: ['E', 'I'],
-  SN: ['S', 'N'],
-  TF: ['T', 'F'],
-  JP: ['J', 'P'],
-}
-
 function resetForm() {
   editingId.value = null
   form.question_text = ''
-  form.dimension = 'EI'
-  form.options = [
-    { key: 'A', text: '', trait: 'E' },
-    { key: 'B', text: '', trait: 'I' },
-    { key: 'C', text: '', trait: 'E' },
-    { key: 'D', text: '', trait: 'I' },
-  ]
+  form.dimension = 'R'
+  form.image = ''
+  form.options = choicesFor('R')
+}
+
+function lettersFor(code) {
+  return STYLE_PAIRS.find((pair) => pair.code === code)?.letters || []
 }
 
 function onDimensionChange() {
-  const [a, b] = traitOptions[form.dimension]
-  form.options[0].trait = a
-  form.options[1].trait = b
-  form.options[2].trait = a
-  form.options[3].trait = b
+  form.options = choicesFor(form.dimension)
 }
 
 function startEdit(q) {
   editingId.value = q.id
   form.question_text = q.question_text
   form.dimension = q.dimension
+  form.image = q.image || ''
   form.options = q.options.map((o) => ({ ...o }))
 }
 
@@ -70,7 +57,14 @@ function save() {
   const payload = {
     question_text: form.question_text.trim(),
     dimension: form.dimension,
-    options: form.options.map((o) => ({ ...o, text: o.text.trim() })),
+    section: sectionOf(form.dimension),
+    image: form.image || '',
+    options: form.options.map((o) => ({
+      ...o,
+      text: o.text.trim(),
+      trait: isStyleCode(form.dimension) ? o.trait : form.dimension,
+      score: Number(o.score),
+    })),
   }
   if (editingId.value) {
     admin.updateQuestion(editingId.value, payload)
@@ -114,17 +108,22 @@ function onDrop(index) {
         <label>
           维度
           <select v-model="form.dimension" @change="onDimensionChange">
-            <option value="EI">E/I</option>
-            <option value="SN">S/N</option>
-            <option value="TF">T/F</option>
-            <option value="JP">J/P</option>
+            <option v-for="item in DIMENSION_OPTIONS" :key="item.code" :value="item.code">
+              {{ item.label }}
+            </option>
           </select>
         </label>
-        <div v-for="opt in form.options" :key="opt.key" class="opt-row">
+        <div v-for="opt in form.options" :key="opt.key" class="opt-row" :class="{ 'opt-row--style': isStyleCode(form.dimension) }">
           <strong>{{ opt.key }}</strong>
           <input v-model="opt.text" placeholder="选项文案" />
-          <select v-model="opt.trait">
-            <option v-for="t in traitOptions[form.dimension]" :key="t" :value="t">{{ t }}</option>
+          <select v-if="isStyleCode(form.dimension)" v-model="opt.trait">
+            <option v-for="letter in lettersFor(form.dimension)" :key="letter" :value="letter">{{ letter }}</option>
+            <option value="">不分</option>
+          </select>
+          <select v-model.number="opt.score">
+            <option :value="2">2 分</option>
+            <option :value="1">1 分</option>
+            <option :value="0">0 分</option>
           </select>
         </div>
         <div class="actions">
@@ -145,7 +144,7 @@ function onDrop(index) {
           @drop="onDrop(index)"
         >
           <div class="q-item__head">
-            <span>#{{ q.order_index }} · {{ q.dimension }}</span>
+            <span>#{{ q.order_index }} · {{ dimensionLabel(q.dimension) }} {{ q.dimension }}</span>
             <div class="actions">
               <button @click="startEdit(q)">编辑</button>
               <button class="danger" @click="remove(q.id)">删除</button>
@@ -153,7 +152,7 @@ function onDrop(index) {
           </div>
           <p>{{ q.question_text }}</p>
           <ul>
-            <li v-for="o in q.options" :key="o.key">{{ o.key }}. {{ o.text }} → {{ o.trait }}</li>
+            <li v-for="o in q.options" :key="o.key">{{ o.key }}. {{ o.text }} → {{ o.score }} 分</li>
           </ul>
         </article>
       </section>
@@ -216,9 +215,13 @@ select {
 
 .opt-row {
   display: grid;
-  grid-template-columns: 28px 1fr 70px;
+  grid-template-columns: 28px 1fr 88px;
   gap: 8px;
   align-items: center;
+}
+
+.opt-row--style {
+  grid-template-columns: 28px 1fr 72px 88px;
 }
 
 .q-item {

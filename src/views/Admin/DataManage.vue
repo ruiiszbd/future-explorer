@@ -6,7 +6,7 @@ import { useAdminStore } from '../../stores/admin'
 
 const admin = useAdminStore()
 const router = useRouter()
-const selectedType = ref(admin.recommendations[0]?.type || 'ISTJ')
+const selectedType = ref(admin.recommendations[0]?.type || 'R')
 
 const form = reactive({
   typeName: '',
@@ -55,7 +55,7 @@ function save() {
 
       <section class="panel">
         <label>
-          选择 MBTI 类型
+          选择职业兴趣
           <select v-model="selectedType">
             <option v-for="t in types" :key="t" :value="t">{{ t }}</option>
           </select>
@@ -84,8 +84,9 @@ function save() {
         <GameButton @click="save">保存当前类型</GameButton>
         <p v-if="admin.message" class="muted">{{ admin.message }}</p>
         <p class="hint">
-          careers 字段建议包含：name, reason, salary, skills, industries, match；
-          majors 字段建议包含：name, level, employmentRate, coreCourses, recommendedSchools, match。
+          careers 字段建议包含：name, reason, skills, industries, valueTags, checks；
+          majors 字段建议包含：name, level, coreCourses, recommendedSchools, valueTags。
+          valueTags 使用 ST、IN、HD、HP、AU、MS。不要填写匹配度。
         </p>
       </section>
     </div>
